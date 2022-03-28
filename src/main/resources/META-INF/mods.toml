@@ -1,0 +1,25 @@
+modLoader="javafml"
+loaderVersion="[40,)"
+license="All rights reserved"
+
+[[mods]]
+    modId="dynamic_races"
+    version="${file.jarVersion}"
+    displayName="Dynamic Races"
+    logoFile="dynamic_races.png"
+    credits=""
+    authors="BadFox49"
+    description='''Adds several playable races, including Beastfolk, Atlanteans, Skyfolk, Hellborne, Voidspawn, and Mankind. All of which have several subspecies and ethnic groups with their own special abilities and faults.'''
+[[dependencies.dynamic_races]]
+    modId="forge"
+    mandatory=true
+    versionRange="[40,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.dynamic_races]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.18.2,1.19)"
+    ordering="NONE"
+    side="BOTH"
