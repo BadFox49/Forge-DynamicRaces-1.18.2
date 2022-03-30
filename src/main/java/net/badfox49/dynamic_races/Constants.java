@@ -1,8 +1,5 @@
 package net.badfox49.dynamic_races;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fml.ModList;
-
 public final class Constants {
 
     protected Constants() {}

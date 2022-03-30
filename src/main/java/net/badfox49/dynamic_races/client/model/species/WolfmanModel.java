@@ -1,27 +1,27 @@
 package net.badfox49.dynamic_races.client.model.species;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.badfox49.dynamic_races.client.model.DynamicRacesModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.CubeDeformation;
-import net.minecraft.client.model.geom.builders.CubeListBuilder;
-import net.minecraft.client.model.geom.builders.LayerDefinition;
-import net.minecraft.client.model.geom.builders.MeshDefinition;
-import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class WolfmanModel<T extends TamableAnimal> extends HumanoidModel<T>
-    implements DynamicRacesModel {
+@OnlyIn(Dist.CLIENT)
+public class WolfmanModel<T extends LivingEntity> extends HumanoidModel<T> {
         private final ModelPart head;
         private final ModelPart nose;
         private final ModelPart body;
         private final ModelPart tail;
         private final ModelPart leftEar;
-        private final ModelPart leftHand;
         private final ModelPart leftLeg;
         private final ModelPart rightEar;
-        private final ModelPart rightHand;
         private final ModelPart rightLeg;
 
     public WolfmanModel(ModelPart modelPart) {
@@ -33,9 +33,7 @@ public class WolfmanModel<T extends TamableAnimal> extends HumanoidModel<T>
         this.tail = modelPart.getChild("tail");
         this.leftEar = modelPart.getChild("left_ear");
         this.leftLeg = modelPart.getChild("left_leg");
-        this.leftHand = modelPart.getChild("left_hand");
         this.rightEar = modelPart.getChild("right_ear");
-        this.rightHand = modelPart.getChild("right_hand");
         this.rightLeg = modelPart.getChild("right_leg");
     }
 
@@ -97,36 +95,37 @@ public class WolfmanModel<T extends TamableAnimal> extends HumanoidModel<T>
                         .addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)),
                 PartPose.offset(-2.0F, 12.0F, 0.0F));
 
-        // Hands
-        partDefinition.addOrReplaceChild("leftHand",
-                CubeListBuilder.create(),
-                PartPose.offset(6.0F, 11.0F, 0.0F));
-        partDefinition.addOrReplaceChild("rightHand",
-                CubeListBuilder.create(),
-                PartPose.offset(-6.0F, 11.0F, 0.0F));
-
         return LayerDefinition.create(meshDefinition, 64, 64);
     }
 
-    @Override
-    public void setupAnim(T entity, float p_102867_, float p_102868_, float p_102869_, float p_102870_, float p_102871_) {
-        if (entity.isInSittingPose()) {
-            this.head.setPos(0.0F, 8.0F, 0.0F);
-            this.nose.setPos(0.0F, 8.0F, 0.0F);
-            this.body.setPos(0.0F, 8.0F, 0.0F);
-            this.tail.setPos(0.0F, 8.0F, 1.0F);
-            this.leftEar.setPos(0.0F, 8.0F, 0.0F);
-            this.rightEar.setPos(0.0F, 8.0F, 0.0F);
-            this.leftArm.setPos(5.0F, 10.0F, 0.0F);
-            this.rightArm.setPos(-5.0F, 10.0F, 0.0F);
-            this.leftLeg.setPos(-1.9F, 22.0F, 0.0F);
-            this.leftLeg.xRot = -1.6F;
-            this.leftLeg.yRot = 0.1F;
-            this.rightLeg.setPos(2.1F, 22.0F, 0.0F);
-            this.rightLeg.xRot = -1.6F;
-            this.rightLeg.yRot = -0.1F;
+    public void renderEars(T pEntity) {
+        if (pEntity.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
+            this.leftEar.visible = true;
+            this.rightEar.visible = true;
         } else {
-            super.setupAnim(entity, p_102867_, p_102868_, p_102869_, p_102870_, p_102871_);
+            this.leftEar.visible = false;
+            this.rightEar.visible = false;
         }
+    }
+
+    @Override
+    public void setupAnim(T pEntity, float pLimbSwing, float pLimbSwingAmount, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
+        super.setupAnim(pEntity, pLimbSwing, pLimbSwingAmount, pAgeInTicks, pNetHeadYaw, pHeadPitch);
+        this.leftEar.copyFrom(this.head);
+        this.rightEar.copyFrom(this.head);
+        this.nose.copyFrom(this.head);
+        if (pEntity.isCrouching()) {
+            this.tail.z = 1.4F;
+            this.tail.y = 1.85F;
+        } else {
+            this.tail.z = 0.0F;
+            this.tail.y = 0.0F;
+        }
+    }
+
+    @Override
+    public void translateToHand(HumanoidArm pSide, PoseStack pPoseStack) {
+        ModelPart modelpart = this.getArm(pSide);
+        modelpart.translateAndRotate(pPoseStack);
     }
 }
